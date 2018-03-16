@@ -49,11 +49,13 @@ public class SwitchMultiButton extends View {
     private static final float STROKE_WIDTH = 2;
     private static final float TEXT_SIZE = 14;
     private static final int SELECTED_COLOR = 0xffeb7b00;
+    private static final int UNSELECTED_COLOR = 0xffffffff;
     private static final int SELECTED_TAB = 0;
     private static final String FONTS_DIR = "fonts/";
     /*other*/
     private Paint mStrokePaint;
-    private Paint mFillPaint;
+    private Paint mSelectedFillPaint;
+    private Paint mUnselectedFillPaint;
     private int mWidth;
     private int mHeight;
     private TextPaint mSelectedTextPaint;
@@ -62,6 +64,7 @@ public class SwitchMultiButton extends View {
     private float mStrokeRadius;
     private float mStrokeWidth;
     private int mSelectedColor;
+    private int mUnselectedColor;
     private float mTextSize;
     private int mSelectedTab;
     private String mTypeface;
@@ -97,6 +100,7 @@ public class SwitchMultiButton extends View {
         mStrokeWidth = typedArray.getDimension(R.styleable.SwitchMultiButton_strokeWidth, STROKE_WIDTH);
         mTextSize = typedArray.getDimension(R.styleable.SwitchMultiButton_textSize, TEXT_SIZE);
         mSelectedColor = typedArray.getColor(R.styleable.SwitchMultiButton_selectedColor, SELECTED_COLOR);
+        mUnselectedColor = typedArray.getColor(R.styleable.SwitchMultiButton_unselectedColor, UNSELECTED_COLOR);
         mSelectedTab = typedArray.getInteger(R.styleable.SwitchMultiButton_selectedTab, SELECTED_TAB);
         mTypeface = typedArray.getString(R.styleable.SwitchMultiButton_typeface);
         int mSwitchTabsResId = typedArray.getResourceId(R.styleable.SwitchMultiButton_switchTabs, 0);
@@ -121,20 +125,25 @@ public class SwitchMultiButton extends View {
         mStrokePaint.setAntiAlias(true);
         mStrokePaint.setStrokeWidth(mStrokeWidth);
         // selected paint
-        mFillPaint = new Paint();
-        mFillPaint.setColor(mSelectedColor);
-        mFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
-        mStrokePaint.setAntiAlias(true);
+        mSelectedFillPaint = new Paint();
+        mSelectedFillPaint.setColor(mSelectedColor);
+        mSelectedFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mSelectedFillPaint.setAntiAlias(true);
+        // unselected paint
+        mUnselectedFillPaint = new Paint();
+        mUnselectedFillPaint.setColor(mUnselectedColor);
+        mUnselectedFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
+        mUnselectedFillPaint.setAntiAlias(true);
         // selected text paint
         mSelectedTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         mSelectedTextPaint.setTextSize(mTextSize);
-        mSelectedTextPaint.setColor(0xffffffff);
-        mStrokePaint.setAntiAlias(true);
+        mSelectedTextPaint.setColor(mUnselectedColor);
+        mSelectedTextPaint.setAntiAlias(true);
         // unselected text paint
         mUnselectedTextPaint = new TextPaint(Paint.ANTI_ALIAS_FLAG);
         mUnselectedTextPaint.setTextSize(mTextSize);
         mUnselectedTextPaint.setColor(mSelectedColor);
-        mStrokePaint.setAntiAlias(true);
+        mUnselectedTextPaint.setAntiAlias(true);
         mTextHeightOffset = -(mSelectedTextPaint.ascent() + mSelectedTextPaint.descent()) * 0.5f;
         mFontMetrics = mSelectedTextPaint.getFontMetrics();
         if (typeface != null) {
@@ -223,19 +232,30 @@ public class SwitchMultiButton extends View {
             if (i == mSelectedTab) {
                 //draw selected tab
                 if (i == 0) {
-                    drawLeftPath(canvas, left, top, bottom);
+                    drawLeftPath(canvas, left, top, bottom, mSelectedFillPaint);
 
                 } else if (i == mTabNum - 1) {
-                    drawRightPath(canvas, top, right, bottom);
+                    drawRightPath(canvas, top, right, bottom, mSelectedFillPaint);
 
                 } else {
-                    canvas.drawRect(new RectF(perWidth * i, top, perWidth * (i + 1), bottom), mFillPaint);
+                    canvas.drawRect(new RectF(perWidth * i, top, perWidth * (i + 1), bottom), mSelectedFillPaint);
                 }
                 // draw selected text
                 canvas.drawText(tabText, 0.5f * perWidth * (2 * i + 1) - 0.5f * tabTextWidth, mHeight * 0.5f +
                         mTextHeightOffset, mSelectedTextPaint);
 
             } else {
+                //draw unselected tab
+                if (i == 0) {
+                    drawLeftPath(canvas, left, top, bottom, mUnselectedFillPaint);
+
+                } else if (i == mTabNum - 1) {
+                    drawRightPath(canvas, top, right, bottom, mUnselectedFillPaint);
+
+                } else {
+                    canvas.drawRect(new RectF(perWidth * i, top, perWidth * (i + 1), bottom), mUnselectedFillPaint);
+                }
+
                 //draw unselected text
                 canvas.drawText(tabText, 0.5f * perWidth * (2 * i + 1) - 0.5f * tabTextWidth, mHeight * 0.5f +
                         mTextHeightOffset, mUnselectedTextPaint);
@@ -251,7 +271,7 @@ public class SwitchMultiButton extends View {
      * @param top
      * @param bottom
      */
-    private void drawLeftPath(Canvas canvas, float left, float top, float bottom) {
+    private void drawLeftPath(Canvas canvas, float left, float top, float bottom, Paint fillPaint) {
         Path leftPath = new Path();
         leftPath.moveTo(left + mStrokeRadius, top);
         leftPath.lineTo(perWidth, top);
@@ -260,7 +280,7 @@ public class SwitchMultiButton extends View {
         leftPath.arcTo(new RectF(left, bottom - 2 * mStrokeRadius, left + 2 * mStrokeRadius, bottom), 90, 90);
         leftPath.lineTo(left, top + mStrokeRadius);
         leftPath.arcTo(new RectF(left, top, left + 2 * mStrokeRadius, top + 2 * mStrokeRadius), 180, 90);
-        canvas.drawPath(leftPath, mFillPaint);
+        canvas.drawPath(leftPath, fillPaint);
     }
 
     /**
@@ -271,16 +291,16 @@ public class SwitchMultiButton extends View {
      * @param right
      * @param bottom
      */
-    private void drawRightPath(Canvas canvas, float top, float right, float bottom) {
+    private void drawRightPath(Canvas canvas, float top, float right, float bottom, Paint fillPaint) {
         Path rightPath = new Path();
         rightPath.moveTo(right - mStrokeRadius, top);
-        rightPath.lineTo(right - perWidth, top);
-        rightPath.lineTo(right - perWidth, bottom);
+        rightPath.lineTo(right - perWidth - mStrokeWidth, top);
+        rightPath.lineTo(right - perWidth - mStrokeWidth, bottom);
         rightPath.lineTo(right - mStrokeRadius, bottom);
         rightPath.arcTo(new RectF(right - 2 * mStrokeRadius, bottom - 2 * mStrokeRadius, right, bottom), 90, -90);
         rightPath.lineTo(right, top + mStrokeRadius);
         rightPath.arcTo(new RectF(right - 2 * mStrokeRadius, top, right, top + 2 * mStrokeRadius), 0, -90);
-        canvas.drawPath(rightPath, mFillPaint);
+        canvas.drawPath(rightPath, fillPaint);
     }
 
 
@@ -405,6 +425,7 @@ public class SwitchMultiButton extends View {
         bundle.putFloat("StrokeWidth", mStrokeWidth);
         bundle.putFloat("TextSize", mTextSize);
         bundle.putInt("SelectedColor", mSelectedColor);
+        bundle.putInt("UnselectedColor", mUnselectedColor);
         bundle.putInt("SelectedTab", mSelectedTab);
         return bundle;
     }
@@ -417,6 +438,7 @@ public class SwitchMultiButton extends View {
             mStrokeWidth = bundle.getFloat("StrokeWidth");
             mTextSize = bundle.getFloat("TextSize");
             mSelectedColor = bundle.getInt("SelectedColor");
+            mUnselectedColor = bundle.getInt("UnselectedColor");
             mSelectedTab = bundle.getInt("SelectedTab");
             super.onRestoreInstanceState(bundle.getParcelable("View"));
         } else {

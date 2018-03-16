@@ -9,4 +9,10 @@
         <item>World</item>
         <item>China</item>
     </string-array>
+    <string-array name="switch_cvs">
+        <item>Git</item>
+        <item>Monotone</item>
+        <item>Subversion</item>
+        <item>CVS</item>
+    </string-array>
 </resources>

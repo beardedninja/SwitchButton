@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              xmlns:app="http://schemas.android.com/apk/res-auto"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:gravity="center_horizontal"
-              android:orientation="vertical"
-              android:padding="16dp">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:background="#D3D3D3"
+    android:padding="16dp">
 
     <lib.kingja.switchbutton.SwitchMultiButton
         android:id="@+id/switchmultibutton1"
@@ -76,5 +77,19 @@
         app:switchTabs="@array/switch_country"
         app:textSize="14sp"
         app:typeface="DeVinneTxtBT.ttf"/>
+
+    <lib.kingja.switchbutton.SwitchMultiButton
+        android:id="@+id/switchmultibutton6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="14dp"
+        android:padding="8dp"
+        app:selectedColor="#FFFF00"
+        app:unselectedColor="#223273"
+        app:selectedTab="0"
+        app:strokeRadius="5dp"
+        app:strokeWidth="1dp"
+        app:switchTabs="@array/switch_cvs"
+        app:textSize="14sp"/>
 
 </LinearLayout>
